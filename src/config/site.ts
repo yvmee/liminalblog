@@ -14,7 +14,7 @@ export const SITE_URL = "https://yvmee.github.io"
  * Sub-path the blog is served from. GitHub Pages serves a project repository
  * named `blog` at `<user>.github.io/blog`, so this must match the repo name.
  */
-export const BASE_PATH = "/blog"
+export const BASE_PATH = "/liminalblog"
 
 export const site = {
   name: "Liminal",
