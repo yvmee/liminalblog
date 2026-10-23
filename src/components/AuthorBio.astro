@@ -1,0 +1,36 @@
+---
+import { author, site } from "../config/site.ts"
+import { href } from "../lib/paths.ts"
+import { Lantern } from "./Lantern.tsx"
+---
+
+<section
+  aria-label="About the author"
+  class="pixel-shadow flex flex-col gap-5 rounded-md border-2 bg-surface p-6 sm:flex-row sm:items-start"
+>
+  <div class="flex size-16 shrink-0 items-center justify-center rounded-sm border-2 border-border-strong bg-void">
+    <Lantern scale={2} glow className="text-border-strong" />
+  </div>
+  <div class="flex flex-col gap-2">
+    <p class="eyebrow">Written by</p>
+    <p class="text-lg font-semibold text-ink">
+      <a href={site.portfolioUrl} rel="author" class="hover:text-lantern">
+        {author.name}
+      </a>
+      <span class="font-normal text-muted"> — {author.jobTitle}</span>
+    </p>
+    <p class="font-serif text-[1.05rem] leading-relaxed text-muted">
+      {author.shortBio}
+    </p>
+    <p class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+      {author.profiles.map((p) => (
+        <a href={p.url} class="link text-muted" rel="me">
+          {p.label}
+        </a>
+      ))}
+      <a href={href("/press/")} class="link text-muted">
+        Editorial policy
+      </a>
+    </p>
+  </div>
+</section>

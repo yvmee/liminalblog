@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" font-family="ui-monospace, monospace" role="img" aria-labelledby="t d">
+  <title id="t">Information horizons in Silent Hill 2</title>
+  <desc id="d">Top-down diagram. James stands at the centre. A small circle marks how far he can see through the fog. A larger dashed circle marks how far the radio can detect enemies. An enemy stands between the two circles: heard, but not seen.</desc>
+  <rect width="800" height="420" fill="#0b1114"/>
+  <defs>
+    <radialGradient id="fog" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#11191d" stop-opacity="0"/>
+      <stop offset=".45" stop-color="#b3c2c2" stop-opacity=".05"/>
+      <stop offset="1" stop-color="#b3c2c2" stop-opacity=".22"/>
+    </radialGradient>
+    <radialGradient id="lamp" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#f0946c" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#f0946c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="0" y="0" width="800" height="420" fill="url(#fog)"/>
+  <!-- radio range -->
+  <circle cx="330" cy="210" r="170" fill="none" stroke="#8fd6c3" stroke-width="2" stroke-dasharray="6 8"/>
+  <!-- sight range -->
+  <circle cx="330" cy="210" r="70" fill="url(#lamp)" stroke="#f0946c" stroke-width="2"/>
+  <!-- player -->
+  <rect x="322" y="202" width="16" height="16" fill="#e2efec"/>
+  <text x="330" y="245" fill="#e2efec" font-size="13" text-anchor="middle">James</text>
+  <!-- enemy, heard not seen -->
+  <rect x="440" y="120" width="14" height="14" fill="#e5605a"/>
+  <path d="M447 112 l0 -8 M437 114 l-5 -6 M457 114 l5 -6" stroke="#e5605a" stroke-width="2"/>
+  <text x="447" y="155" fill="#e5605a" font-size="13" text-anchor="middle">enemy</text>
+  <!-- legend -->
+  <g font-size="14">
+    <rect x="560" y="120" width="14" height="14" fill="none" stroke="#f0946c" stroke-width="2"/>
+    <text x="584" y="132" fill="#e2efec">Sight: fog / flashlight</text>
+    <rect x="560" y="160" width="14" height="14" fill="none" stroke="#8fd6c3" stroke-width="2" stroke-dasharray="3 3"/>
+    <text x="584" y="172" fill="#e2efec">Hearing: radio static</text>
+    <rect x="560" y="200" width="14" height="14" fill="#e5605a"/>
+    <text x="584" y="212" fill="#e2efec">Threat in the gap</text>
+    <text x="560" y="262" fill="#b3c2c2" font-size="12">Dread lives between</text>
+    <text x="560" y="280" fill="#b3c2c2" font-size="12">the two circles.</text>
+  </g>
+</svg>

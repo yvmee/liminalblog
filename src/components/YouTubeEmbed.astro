@@ -1,0 +1,66 @@
+---
+/**
+ * Privacy-friendly YouTube embed: nothing loads from Google until the reader
+ * clicks, then the youtube-nocookie player replaces the poster.
+ * <YouTubeEmbed id="VIDEO_ID" title="Launch trailer" />
+ */
+import { Lantern } from "./Lantern.tsx"
+
+interface Props {
+  id: string
+  title: string
+  /** Start time in seconds */
+  start?: number
+  caption?: string
+}
+const { id, title, start, caption } = Astro.props
+const params = new URLSearchParams({ autoplay: "1", rel: "0" })
+if (start) params.set("start", String(start))
+const src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?${params}`
+const watchUrl = `https://www.youtube.com/watch?v=${encodeURIComponent(id)}${start ? `&t=${start}s` : ""}`
+---
+
+<figure class="my-10 flex flex-col gap-3">
+  <div
+    class="yt-embed pixel-shadow relative aspect-video overflow-hidden rounded-md border-2 bg-void"
+    data-src={src}
+    data-title={title}
+  >
+    <button
+      type="button"
+      class="group absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-4 p-6 text-center"
+      aria-label={`Play video: ${title}`}
+    >
+      <Lantern scale={3} glow className="text-border-strong" />
+      <span class="max-w-md font-sans text-lg font-semibold text-ink group-hover:text-lantern">
+        ▶ {title}
+      </span>
+      <span class="max-w-sm font-sans text-xs text-faint">
+        Click to load the video from YouTube (youtube-nocookie.com). Google’s
+        privacy policy applies.
+      </span>
+    </button>
+  </div>
+  <figcaption class="flex flex-wrap justify-between gap-2 font-sans text-sm text-muted">
+    <span>{caption}</span>
+    <a href={watchUrl} class="link text-xs" rel="noopener">
+      Watch on YouTube
+    </a>
+  </figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".yt-embed").forEach((el) => {
+    el.querySelector("button")?.addEventListener("click", () => {
+      const iframe = document.createElement("iframe")
+      iframe.src = el.dataset.src!
+      iframe.title = el.dataset.title!
+      iframe.allow =
+        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      iframe.allowFullscreen = true
+      iframe.className = "absolute inset-0 size-full"
+      el.replaceChildren(iframe)
+      iframe.focus()
+    })
+  })
+</script>

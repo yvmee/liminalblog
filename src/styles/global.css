@@ -1,0 +1,275 @@
+@import "tailwindcss";
+@import "@fontsource-variable/lexend";
+@import "@fontsource-variable/newsreader";
+@import "@fontsource-variable/newsreader/wght-italic.css";
+@import "@fontsource-variable/pixelify-sans";
+@import "@fontsource-variable/jetbrains-mono";
+
+@theme inline {
+  --font-sans: "Lexend Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader Variable", ui-serif, Georgia, serif;
+  --font-pixel: "Pixelify Sans Variable", var(--font-sans);
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --color-void: var(--void);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-lantern: var(--lantern);
+  --color-ember: var(--ember);
+  --color-flame: var(--flame);
+  --color-glass: var(--glass);
+  --color-mist: var(--mist);
+  --color-violet: var(--violet);
+  --color-blood: var(--blood);
+
+  --animate-flicker: flicker 2.4s steps(1) infinite;
+  --animate-sway: sway 6s ease-in-out infinite;
+}
+
+/*
+ * Dark only. Derived from the portfolio's night palette: deep teal-black sky,
+ * mint ink, and the coral "warm lamp light" promoted to a lantern.
+ */
+:root {
+  color-scheme: dark;
+  --void: oklch(0.11 0.012 225);
+  --background: oklch(0.145 0.015 220);
+  --surface: oklch(0.18 0.018 215);
+  --raised: oklch(0.22 0.02 212);
+  --border: oklch(0.3 0.02 210);
+  --border-strong: oklch(0.42 0.025 205);
+  --ink: oklch(0.93 0.018 182);
+  --muted: oklch(0.76 0.02 195);
+  --faint: oklch(0.6 0.02 200);
+  --lantern: oklch(0.8 0.11 38);
+  --ember: oklch(0.66 0.15 34);
+  --flame: oklch(0.95 0.05 80);
+  --glass: oklch(0.36 0.07 40);
+  --mist: oklch(0.83 0.08 172);
+  --violet: oklch(0.72 0.13 285);
+  --blood: oklch(0.68 0.16 22);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply scroll-smooth bg-background font-sans text-ink;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    @apply min-h-dvh bg-background antialiased;
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 50% -10%,
+        color-mix(in oklch, var(--lantern) 9%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 60% 40% at 100% 100%,
+        color-mix(in oklch, var(--mist) 4%, transparent),
+        transparent 70%
+      );
+    background-attachment: fixed;
+  }
+  ::selection {
+    @apply bg-lantern text-void;
+  }
+  :focus-visible {
+    @apply rounded-xs outline-2 outline-offset-2 outline-lantern;
+  }
+}
+
+/* Ink link with a lantern-colored underline, as on the portfolio */
+@utility link {
+  @apply underline decoration-lantern/70 decoration-2 underline-offset-4 transition-colors hover:text-lantern hover:decoration-lantern;
+}
+
+/* Pixel-stepped hard shadow, the portfolio's window shadow in the dark */
+@utility pixel-shadow {
+  box-shadow: 4px 4px 0 0 var(--void);
+}
+
+/* The same shadow plus lantern light spilling around the edges */
+@utility glow-lantern {
+  box-shadow:
+    4px 4px 0 0 var(--void),
+    0 0 40px -8px color-mix(in oklch, var(--lantern) 45%, transparent);
+}
+
+@utility eyebrow {
+  @apply font-mono text-[0.7rem] tracking-[0.18em] text-faint uppercase;
+}
+
+@layer components {
+  /* Film grain + vignette over everything, purely decorative */
+  .grain::before {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 1s steps(4) infinite;
+  }
+  .grain::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 59;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 55%,
+      color-mix(in oklch, var(--void) 70%, transparent) 100%
+    );
+  }
+}
+
+/* Long-form article typography */
+@layer components {
+  .prose-horror {
+    @apply font-serif text-[1.18rem] leading-[1.75] text-ink/90;
+  }
+  .prose-horror > * + * {
+    @apply mt-6;
+  }
+  .prose-horror h2 {
+    @apply mt-14 scroll-mt-24 font-sans text-2xl font-semibold tracking-tight text-ink sm:text-3xl;
+  }
+  .prose-horror h2::before {
+    content: "";
+    @apply mb-4 block h-0.5 w-10 bg-lantern;
+  }
+  .prose-horror h3 {
+    @apply mt-10 scroll-mt-24 font-sans text-xl font-semibold text-ink;
+  }
+  .prose-horror h4 {
+    @apply mt-8 font-sans text-lg font-medium text-ink;
+  }
+  .prose-horror a {
+    @apply link;
+  }
+  .prose-horror strong {
+    @apply font-semibold text-ink;
+  }
+  .prose-horror em {
+    @apply italic;
+  }
+  .prose-horror > ul,
+  .prose-horror > ol {
+    @apply space-y-2 pl-6;
+  }
+  .prose-horror > ul {
+    list-style: none;
+  }
+  .prose-horror > ul > li {
+    @apply relative;
+  }
+  .prose-horror > ul > li::before {
+    content: "";
+    @apply absolute top-[0.7em] -left-5 size-1.5 bg-lantern;
+  }
+  .prose-horror > ol {
+    @apply list-decimal marker:font-mono marker:text-sm marker:text-lantern;
+  }
+  .prose-horror blockquote {
+    @apply border-l-2 border-lantern pl-6 text-[1.3rem] text-muted italic;
+  }
+  .prose-horror hr {
+    @apply my-12 border-border;
+  }
+  .prose-horror code:not(pre code) {
+    @apply rounded-sm bg-raised px-1.5 py-0.5 font-mono text-[0.85em] text-lantern;
+  }
+  .prose-horror pre {
+    @apply overflow-x-auto rounded-md border-2 p-4 font-mono text-sm leading-relaxed;
+  }
+  .prose-horror table {
+    @apply w-full border-collapse font-sans text-base;
+  }
+  .prose-horror th,
+  .prose-horror td {
+    @apply border-b px-3 py-2 text-left align-top;
+  }
+  .prose-horror th {
+    @apply font-mono text-xs tracking-wider text-faint uppercase;
+  }
+  .prose-horror img {
+    @apply rounded-md border-2;
+  }
+  /* Drop cap on the first paragraph (articles only) */
+  .drop-cap > p:first-of-type::first-letter {
+    @apply float-left mt-1.5 mr-3 font-pixel text-[4.2rem] leading-[0.8] text-lantern;
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  12% {
+    opacity: 0.82;
+  }
+  14% {
+    opacity: 1;
+  }
+  47% {
+    opacity: 0.9;
+  }
+  49% {
+    opacity: 0.7;
+  }
+  52% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.88;
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    rotate: -2deg;
+  }
+  50% {
+    rotate: 2deg;
+  }
+}
+
+@keyframes grain {
+  0% {
+    translate: 0 0;
+  }
+  25% {
+    translate: -5% 3%;
+  }
+  50% {
+    translate: 4% -4%;
+  }
+  75% {
+    translate: -3% -2%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

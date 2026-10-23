@@ -1,0 +1,6 @@
+# Crawlers only read robots.txt from the domain root (yvmee.github.io/robots.txt),
+# which is served by the portfolio repository. Add the Sitemap line below there too.
+User-agent: *
+Allow: /
+
+Sitemap: https://yvmee.github.io/blog/sitemap-index.xml

@@ -1,0 +1,180 @@
+---
+import { CategoryBadge } from "../components/CategoryBadge.tsx"
+import InteractivePostFilter from "../components/InteractivePostFilter.tsx"
+import { Flame, Lantern } from "../components/Lantern.tsx"
+import LanternDivider from "../components/LanternDivider.astro"
+import { ScaredyBadge } from "../components/ScaredyBadge.tsx"
+import { ScoreBadge } from "../components/ScoreBadge.tsx"
+import { author, categories, site } from "../config/site.ts"
+import BaseLayout from "../layouts/BaseLayout.astro"
+import { formatDate } from "../lib/format.ts"
+import { href } from "../lib/paths.ts"
+import { getPosts, toCard } from "../lib/posts.ts"
+import {
+  blogSchema,
+  graph,
+  personSchema,
+  websiteSchema,
+} from "../lib/schema.ts"
+
+const posts = await getPosts()
+const cards = posts.map(toCard)
+const featured =
+  cards.find((c) => posts.find((p) => p.id === c.slug)?.data.featured) ??
+  cards[0]
+const tabs = (Object.keys(categories) as (keyof typeof categories)[]).map(
+  (key) => ({
+    key,
+    label: categories[key].short,
+  })
+)
+---
+
+<BaseLayout
+  title={site.name}
+  description={site.description}
+  path="/"
+  jsonLd={graph(websiteSchema(), blogSchema(posts), personSchema())}
+>
+  <section
+    id="hero"
+    class="relative isolate overflow-hidden border-b-2 border-border"
+    style="--x: 72%; --y: 45%"
+  >
+    <!-- Lantern light: follows the pointer on desktop, rests on the lantern otherwise -->
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-0 -z-10 transition-[background] duration-300"
+      style="background: radial-gradient(circle 360px at var(--x) var(--y), color-mix(in oklch, var(--lantern) 14%, transparent), transparent 70%)"
+    ></div>
+    <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-[1fr_auto] md:py-24">
+      <div class="flex max-w-2xl flex-col gap-6">
+        <p class="eyebrow flex items-center gap-2">
+          <Flame scale={2} flicker />
+          Horror game criticism & ludology research
+        </p>
+        <h1 class="font-serif text-5xl leading-[1.02] font-medium tracking-tight text-balance text-ink sm:text-6xl lg:text-7xl">
+          <span class="sr-only">{site.name}: </span>
+          Horror games, <em class="text-lantern">read closely.</em>
+        </h1>
+        <p class="max-w-xl font-serif text-xl leading-relaxed text-muted">
+          Reviews and research on how fear is built and recommendations for scared horror enthusiasts.
+        </p>
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <a
+            href="#archive"
+            class="pixel-shadow rounded-sm border-2 border-lantern bg-lantern px-4 py-2 text-sm font-medium text-void transition-transform hover:-translate-y-0.5"
+          >
+            Enter the archive
+          </a>
+          <a
+            href={href("/press/")}
+            class="rounded-sm border-2 border-border-strong px-4 py-2 text-sm text-ink transition-colors hover:border-lantern hover:text-lantern"
+          >
+            Press kit & policy
+          </a>
+          <span class="font-mono text-xs text-faint">by {author.name}</span>
+        </div>
+      </div>
+      <div id="hero-lantern" class="hidden justify-center md:flex md:pr-10">
+        <Lantern scale={9} glow sway className="text-void" />
+      </div>
+    </div>
+  </section>
+
+  {featured && (
+    <section
+      aria-labelledby="featured-title"
+      class="mx-auto max-w-6xl px-4 pt-14 sm:px-6"
+    >
+      <article class="group glow-lantern relative grid overflow-hidden rounded-md border-2 border-lantern/40 bg-surface transition-colors hover:border-lantern lg:grid-cols-[1.35fr_1fr]">
+        <div class="relative aspect-[1200/630] overflow-hidden border-b-2 bg-void lg:aspect-auto lg:border-r-2 lg:border-b-0">
+          <img
+            src={featured.coverImage}
+            alt={featured.coverImageAlt}
+            width="1200"
+            height="630"
+            fetchpriority="high"
+            class="size-full object-cover object-left brightness-90 grayscale-[35%] transition duration-700 group-hover:scale-[1.02] group-hover:grayscale-0"
+          />
+        </div>
+        <div class="flex flex-col gap-4 p-6 sm:p-8">
+          <p class="eyebrow flex items-center gap-2 text-lantern">
+            <Lantern scale={1} flicker className="text-void" /> Featured
+          </p>
+          <div class="flex flex-wrap items-center gap-2">
+            <CategoryBadge
+              category={featured.category}
+              label={featured.categoryLabel}
+            />
+            {featured.score !== undefined && (
+              <ScoreBadge score={featured.score} />
+            )}
+            {featured.scaredyScore !== undefined && (
+              <ScaredyBadge score={featured.scaredyScore} />
+            )}
+          </div>
+          <h2
+            id="featured-title"
+            class="font-serif text-3xl leading-tight font-medium tracking-tight text-balance text-ink sm:text-4xl"
+          >
+            <a
+              href={featured.url}
+              class="after:absolute after:inset-0 after:content-[''] group-hover:text-lantern"
+            >
+              {featured.title}
+            </a>
+          </h2>
+          <p class="font-serif text-lg leading-relaxed text-muted">
+            {featured.description}
+          </p>
+          <p class="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2 font-mono text-xs text-faint">
+            <span>
+              <time datetime={featured.date}>{formatDate(featured.date)}</time>{" "}
+              · {featured.readingTime} min read
+            </span>
+            <span
+              aria-hidden="true"
+              class="text-lantern transition-transform group-hover:translate-x-1"
+            >
+              Read →
+            </span>
+          </p>
+        </div>
+      </article>
+    </section>
+  )}
+
+  <section
+    id="archive"
+    aria-labelledby="archive-title"
+    class="mx-auto flex max-w-6xl scroll-mt-20 flex-col gap-8 px-4 pt-20 sm:px-6"
+  >
+    <LanternDivider label="The Archive" id="archive-title" />
+    <InteractivePostFilter client:load posts={cards} categories={tabs} />
+  </section>
+</BaseLayout>
+
+<script>
+  // Pointer-following lantern light on the hero (desktop, motion allowed)
+  const hero = document.getElementById("hero")
+  if (
+    hero &&
+    matchMedia("(pointer: fine)").matches &&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    let frame = 0
+    hero.addEventListener("pointermove", (e) => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        const rect = hero.getBoundingClientRect()
+        hero.style.setProperty("--x", `${e.clientX - rect.left}px`)
+        hero.style.setProperty("--y", `${e.clientY - rect.top}px`)
+      })
+    })
+    hero.addEventListener("pointerleave", () => {
+      hero.style.setProperty("--x", "72%")
+      hero.style.setProperty("--y", "45%")
+    })
+  }
+</script>

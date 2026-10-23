@@ -1,0 +1,351 @@
+---
+import Breadcrumbs from "../components/Breadcrumbs.astro"
+import { Flame, Lantern } from "../components/Lantern.tsx"
+import {
+  author,
+  categories,
+  press,
+  scaredyScale,
+  scoreRubric,
+  site,
+} from "../config/site.ts"
+import BaseLayout from "../layouts/BaseLayout.astro"
+import { formatDate } from "../lib/format.ts"
+import { absoluteUrl, href } from "../lib/paths.ts"
+import { getPosts } from "../lib/posts.ts"
+import {
+  breadcrumbSchema,
+  graph,
+  ids,
+  personSchema,
+  websiteSchema,
+} from "../lib/schema.ts"
+
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`
+
+const posts = (await getPosts()).filter((p) => !p.data.draft)
+const reviews = posts.filter((p) => p.data.review)
+const latest = posts[0]?.data.pubDate
+
+const sections = [
+  { id: "mission", label: "Mission" },
+  { id: "coverage", label: "Coverage" },
+  { id: "scoring", label: "Scoring rubric" },
+  { id: "ethics", label: "Ethics & disclosure" },
+  { id: "contact", label: "Contact" },
+]
+
+const mailSubject = encodeURIComponent(
+  `${press.subjectPrefix} Game title – Platform`
+)
+const mailto = `mailto:${press.email}?subject=${mailSubject}`
+
+const jsonLd = graph(
+  {
+    "@type": "AboutPage",
+    "@id": `${absoluteUrl("/press/")}#page`,
+    name: `Press Kit & Editorial Policy · ${site.name}`,
+    url: absoluteUrl("/press/"),
+    isPartOf: { "@id": ids.website },
+    about: { "@id": ids.author },
+    mainEntity: { "@id": ids.author },
+  },
+  breadcrumbSchema([
+    { name: "Portfolio", url: site.portfolioUrl },
+    { name: "Blog", url: absoluteUrl("/") },
+    { name: "Press Kit", url: absoluteUrl("/press/") },
+  ]),
+  personSchema(),
+  websiteSchema()
+)
+
+const facts = [
+  ["Publication", site.name],
+  ["URL", absoluteUrl("/").replace(/^https:\/\//, "")],
+  ["Editor & critic", author.name],
+  ["Focus", "Horror games and ludology research"],
+  ["Format", "Long-form reviews, analyses, event coverage"],
+  ["Language", press.languages.join(", ")],
+  ["Based in", author.location],
+  [
+    "Published",
+    `${plural(posts.length, "article")} · ${plural(reviews.length, "review")}`,
+  ],
+  ...(latest ? [["Last article", formatDate(latest)]] : []),
+] as const
+---
+
+<BaseLayout
+  title="Press Kit & Editorial Policy"
+  description="Press kit for event accreditation and PR: publication mission, review scoring rubric, ethics and disclosure policy, and how to send review codes."
+  path="/press/"
+  type="profile"
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+    <Breadcrumbs
+      items={[
+        { name: "Portfolio", href: site.portfolioUrl },
+        { name: "Blog", href: href("/") },
+        { name: "Press Kit" },
+      ]}
+    />
+
+    <header class="flex flex-col gap-5 border-b-2 border-border pt-10 pb-12">
+      <p class="eyebrow flex items-center gap-2">
+        <Flame scale={2} flicker /> For accreditation desks, PR and developers
+      </p>
+      <h1 class="max-w-3xl font-serif text-5xl leading-[1.05] font-medium tracking-tight text-ink sm:text-6xl">
+        Press Kit & Editorial Policy
+      </h1>
+      <p class="max-w-2xl font-serif text-xl leading-relaxed text-muted">
+        Everything an accreditation officer, PR agency or developer needs to
+        know about {site.name}: who writes it, what it covers, how reviews are
+        scored, and how to get a game in front of us.
+      </p>
+      <nav aria-label="Press kit sections" class="flex flex-wrap gap-2 pt-2">
+        {sections.map((s) => (
+          <a
+            href={`#${s.id}`}
+            class="rounded-sm border-2 border-border-strong px-3 py-1 text-sm text-muted transition-colors hover:border-lantern hover:text-lantern"
+          >
+            {s.label}
+          </a>
+        ))}
+      </nav>
+    </header>
+
+    <div class="grid gap-12 pt-12 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div class="prose-horror min-w-0">
+        <h2 id="mission">Publication mission</h2>
+        <p>
+          <strong>{site.name}</strong> publishes analytical horror game
+          criticism and ludology research. The goal is to explain <em>why</em> a
+          horror game works, not only whether it does: how its systems, level
+          layouts, audio, camera and interface manufacture dread, and what that
+          tells us about the genre and about play.
+        </p>
+        <p>
+          Every review is written from two perspectives at once: as a game
+          enthusiast, and as an academic researcher who studies how players
+          perceive and feel inside virtual spaces. The result is an analysis
+          that is useful to players, and to the people who study games.
+        </p>
+
+        <h2 id="coverage">Coverage</h2>
+        <ul>
+          {Object.values(categories).map((c) => (
+            <li>
+              <strong>{c.label}.</strong> {c.description}
+            </li>
+          ))}
+        </ul>
+        <p>
+          Indie and AA horror is a priority alongside major releases. Review
+          platforms: {press.platforms.join("; ")}. New articles are announced
+          via the <a href={href("/rss.xml")}>RSS feed</a>.
+        </p>
+
+        <h2 id="scoring">Review scoring rubric</h2>
+        <p>
+          Reviews can carry two independent ratings: a{" "}
+          <strong>quality score</strong>
+          for how good the game is, and the <strong>{scaredyScale.name}</strong>
+          for how playable it is if you scare easily. A brilliant game can be
+          unplayable for a nervous player, and a gentle one can still be a
+          masterpiece. Neither rating is mandatory; some articles carry one,
+          both, or none.
+        </p>
+        <p>
+          Ratings are never negotiated, shared before publication, or changed
+          after the fact; if my view changes, I write a follow-up.
+        </p>
+        <h3>Quality score (0–10)</h3>
+        <p>
+          How well a work achieves what it sets out to do as horror, weighed
+          against craft, originality and how long it stays with you. Half points
+          sit between the bands below.
+        </p>
+      </div>
+
+      <aside class="lg:row-span-3">
+        <div class="glow-lantern flex flex-col gap-5 rounded-md border-2 border-lantern/50 bg-surface p-6 lg:sticky lg:top-24">
+          <div class="flex items-center justify-between">
+            <p class="font-mono text-xs tracking-[0.18em] text-ink uppercase">
+              At a glance
+            </p>
+            <Lantern scale={1.5} className="text-void" />
+          </div>
+          <dl class="flex flex-col gap-3">
+            {facts.map(([label, value]) => (
+              <div class="flex flex-col gap-0.5 border-b border-border pb-3 last:border-0 last:pb-0">
+                <dt class="eyebrow">{label}</dt>
+                <dd class="text-sm text-ink">{value}</dd>
+              </div>
+            ))}
+          </dl>
+          <a
+            href={mailto}
+            class="pixel-shadow rounded-sm border-2 border-lantern bg-lantern px-4 py-2 text-center text-sm font-medium text-void"
+          >
+            Send a review code
+          </a>
+          <a
+            href={site.portfolioUrl}
+            class="link text-center text-sm text-muted"
+          >
+            View developer portfolio
+          </a>
+        </div>
+      </aside>
+
+      <div class="min-w-0">
+        <div class="overflow-hidden rounded-md border-2">
+          <table class="w-full border-collapse text-left">
+            <caption class="sr-only">
+              Review score bands and their meaning
+            </caption>
+            <thead class="bg-raised">
+              <tr>
+                <th scope="col" class="eyebrow w-20 px-4 py-3">
+                  Score
+                </th>
+                <th scope="col" class="eyebrow w-32 px-4 py-3">
+                  Label
+                </th>
+                <th scope="col" class="eyebrow px-4 py-3">
+                  Meaning
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {scoreRubric.map((band) => (
+                <tr class="border-t border-border align-top">
+                  <td
+                    class="px-4 py-3 font-pixel text-2xl text-lantern"
+                    style={`opacity: ${0.35 + band.score * 0.065}`}
+                  >
+                    {band.score}
+                  </td>
+                  <td class="px-4 py-3 text-sm font-semibold text-ink">
+                    {band.label}
+                  </td>
+                  <td class="px-4 py-3 font-serif text-[1.02rem] leading-snug text-muted">
+                    {band.text}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose-horror mt-12">
+          <h3 id="scaredy-cat-scale">{scaredyScale.name} (1–10)</h3>
+          <p>
+            A recommendation for people who are scared of horror games, but
+            curious. <strong>1</strong> means do not play it, you will
+            immediately quit; <strong>10</strong> means it is not scary to play
+            at all. It rates how frightening the game is to <em>play</em> (jump
+            scares, chases, pressure, lack of safe spaces and disturbing
+            content), not how good it is. Whole points only.
+          </p>
+        </div>
+        <div class="mt-6 overflow-hidden rounded-md border-2">
+          <table class="w-full border-collapse text-left">
+            <caption class="sr-only">
+              {scaredyScale.name}bands and their meaning
+            </caption>
+            <thead class="bg-raised">
+              <tr>
+                <th scope="col" class="eyebrow w-20 px-4 py-3">
+                  Rating
+                </th>
+                <th scope="col" class="eyebrow w-32 px-4 py-3">
+                  Label
+                </th>
+                <th scope="col" class="eyebrow px-4 py-3">
+                  What to expect
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {scaredyScale.bands.map((band) => (
+                <tr class="border-t border-border align-top">
+                  <td class="px-4 py-3 font-pixel text-2xl whitespace-nowrap text-mist">
+                    {band.min}–{band.min + 1}
+                  </td>
+                  <td class="px-4 py-3 text-sm font-semibold text-ink">
+                    {band.label}
+                  </td>
+                  <td class="px-4 py-3 font-serif text-[1.02rem] leading-snug text-muted">
+                    {band.text}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="prose-horror min-w-0">
+        <h2 id="ethics">Ethics & review key disclosure policy</h2>
+        <ul>
+          <li>
+            <strong>Disclosure on every review.</strong> Each review states how
+            access was obtained ("Review copy provided by the publisher",
+            "Purchased independently", "Played at a press event") in its verdict
+            box, next to the score.
+          </li>
+          <li>
+            <strong>No obligation.</strong> Review codes are accepted with no
+            promise of coverage, timing or tone. Receiving a key does not
+            guarantee a review, and never a positive one.
+          </li>
+          <li>
+            <strong>No paid coverage.</strong> {site.name} does not accept
+            payment, gifts beyond the review copy, or affiliate deals in
+            exchange for coverage. Should sponsored content or affiliate links
+            ever appear, they will be labelled clearly at the top of the
+            article.
+          </li>
+          <li>
+            <strong>Conflicts of interest.</strong> As a working developer, I do
+            not review games I contributed to, or games from studios where I
+            have a financial or employment relationship. Professional or
+            personal connections to a reviewed team are disclosed in the
+            article.
+          </li>
+          <li>
+            <strong>Embargoes.</strong> Embargoes agreed in writing are
+            honoured. Previews and reviews in progress are labelled as such.
+          </li>
+          <li>
+            <strong>Play standard.</strong> Reviews are based on completing the
+            main campaign unless the article states otherwise, with play time
+            and platform noted.
+          </li>
+          <li>
+            <strong>Corrections.</strong> Factual errors are corrected promptly,
+            and the article shows an "Updated" date.
+          </li>
+          <li>
+            <strong>Spoilers.</strong> Reviews avoid major plot spoilers;
+            research pieces that need them say so up front.
+          </li>
+        </ul>
+
+        <h2 id="contact">Contact</h2>
+        <p>
+          For any questions or requests, contact me via email:{" "}
+          <a href={mailto}>{press.email}</a>.
+        </p>
+
+        <p>
+          The full archive is on the <a href={href("/")}>blog index</a> and in
+          the <a href={href("/rss.xml")}>RSS feed</a>, with publication dates on
+          every article.
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

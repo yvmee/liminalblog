@@ -1,0 +1,133 @@
+# Pages CMS (https://pagescms.org): edit posts in the browser.
+# Sign in at app.pagescms.org with GitHub and open this repository.
+# Mirrors src/content.config.ts; keep the category values in sync with
+# `categories` in src/config/site.ts.
+
+media:
+  input: public/images
+  output: /images
+
+content:
+  - name: posts
+    label: Posts
+    type: collection
+    path: src/content/posts
+    format: yaml-frontmatter
+    filename: "{title}.mdx"
+    view:
+      fields: [title, category, pubDate, draft]
+      primary: title
+      sort: pubDate
+      order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: description
+        label: Description (120-160 characters, for search results and social cards)
+        type: text
+        required: true
+        options:
+          minlength: 120
+          maxlength: 160
+      - name: pubDate
+        label: Publish date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: updatedDate
+        label: Updated date (only after a meaningful revision)
+        type: date
+        options:
+          format: yyyy-MM-dd
+      - name: category
+        label: Category
+        type: select
+        required: true
+        options:
+          values:
+            - name: horror-games
+              label: Horror Games
+            - name: ludology-research
+              label: Ludology Research
+            - name: event-coverage
+              label: Event Coverage
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+      - name: coverImage
+        label: Cover image (1200x630)
+        type: image
+        required: true
+      - name: coverImageAlt
+        label: Cover image alt text
+        type: string
+        required: true
+      - name: featured
+        label: Featured on the homepage
+        type: boolean
+        default: false
+      - name: draft
+        label: Draft (hidden from the live site)
+        type: boolean
+        default: true
+      - name: review
+        label: Review (leave empty unless this post is a review)
+        type: object
+        fields:
+          - name: subjectTitle
+            label: Game or movie title
+            type: string
+          - name: creator
+            label: Developer / studio / director
+            type: string
+          - name: publisher
+            label: Publisher / production company
+            type: string
+          - name: releaseYear
+            label: Release year
+            type: number
+            options:
+              min: 1900
+              max: 2100
+          - name: platforms
+            label: Platforms
+            type: string
+            list: true
+          - name: horrorSubgenre
+            label: Horror subgenre
+            type: string
+          - name: score
+            label: Quality score (optional, 0-10, half points allowed)
+            type: number
+            options:
+              min: 0
+              max: 10
+          - name: scaredyScore
+            label: Scaredy-Cat Scale (optional, 1 = do not play, 10 = not scary at all)
+            type: number
+            options:
+              min: 1
+              max: 10
+          - name: verdict
+            label: Verdict (1-2 sentences)
+            type: text
+          - name: pros
+            label: Pros
+            type: string
+            list: true
+          - name: cons
+            label: Cons
+            type: string
+            list: true
+          - name: disclosure
+            label: Disclosure (e.g. "Review copy provided by publisher")
+            type: string
+      - name: body
+        label: Body (Markdown / MDX)
+        type: code
+        options:
+          format: mdx

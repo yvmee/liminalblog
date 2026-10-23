@@ -1,0 +1,111 @@
+---
+import type { GetStaticPaths } from "astro"
+
+import Breadcrumbs from "../../components/Breadcrumbs.astro"
+import { Lantern } from "../../components/Lantern.tsx"
+import { PostCard } from "../../components/PostCard.tsx"
+import { categories, site, type CategoryKey } from "../../config/site.ts"
+import BaseLayout from "../../layouts/BaseLayout.astro"
+import { absoluteUrl, categoryHref, href } from "../../lib/paths.ts"
+import { getPosts, toCard } from "../../lib/posts.ts"
+import {
+  breadcrumbSchema,
+  graph,
+  ids,
+  personSchema,
+  websiteSchema,
+} from "../../lib/schema.ts"
+
+/** One archive per category that has posts (empty archives would be thin content). */
+export const getStaticPaths = (async () => {
+  const posts = await getPosts()
+  return (Object.keys(categories) as CategoryKey[])
+    .map((category) => ({
+      category,
+      posts: posts.filter((p) => p.data.category === category),
+    }))
+    .filter(({ posts }) => posts.length > 0)
+    .map(({ category, posts }) => ({
+      params: { category },
+      props: { category, posts },
+    }))
+}) satisfies GetStaticPaths
+
+const { category, posts } = Astro.props
+const meta = categories[category]
+const cards = posts.map(toCard)
+const path = `/category/${category}/`
+
+const jsonLd = graph(
+  {
+    "@type": "CollectionPage",
+    "@id": `${absoluteUrl(path)}#page`,
+    name: `${meta.label} · ${site.name}`,
+    description: meta.description,
+    url: absoluteUrl(path),
+    isPartOf: { "@id": ids.website },
+    author: { "@id": ids.author },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: cards.map((c, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: absoluteUrl(`/${c.slug}/`),
+        name: c.title,
+      })),
+    },
+  },
+  breadcrumbSchema([
+    { name: "Portfolio", url: site.portfolioUrl },
+    { name: "Blog", url: absoluteUrl("/") },
+    { name: meta.label, url: absoluteUrl(path) },
+  ]),
+  personSchema(),
+  websiteSchema()
+)
+---
+
+<BaseLayout
+  title={meta.label}
+  description={meta.description}
+  path={path}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto flex max-w-6xl flex-col gap-10 px-4 pt-8 sm:px-6">
+    <Breadcrumbs
+      items={[
+        { name: "Portfolio", href: site.portfolioUrl },
+        { name: "Blog", href: href("/") },
+        { name: meta.label, href: categoryHref(category) },
+      ]}
+    />
+    <header class="flex flex-col items-start gap-5 border-b-2 border-border pb-10 sm:flex-row sm:items-end sm:justify-between">
+      <div class="flex max-w-2xl flex-col gap-4">
+        <p class="eyebrow">
+          Category · {cards.length} {cards.length === 1 ? "post" : "posts"}
+        </p>
+        <h1 class="font-serif text-5xl font-medium tracking-tight text-ink sm:text-6xl">
+          {meta.label}
+        </h1>
+        <p class="font-serif text-xl leading-relaxed text-muted">
+          {meta.description}
+        </p>
+      </div>
+      <div class="hidden sm:block">
+        <Lantern scale={5} glow sway className="text-void" />
+      </div>
+    </header>
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {cards.map((card, i) => (
+        <li class="flex">
+          <PostCard
+            post={card}
+            headingLevel={2}
+            eager={i < 3}
+            className="flex-1"
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>

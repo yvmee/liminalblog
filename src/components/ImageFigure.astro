@@ -1,0 +1,38 @@
+---
+/**
+ * Captioned image for MDX:
+ * <ImageFigure src="/images/posts/slug/a.png" alt="..." caption="..." />
+ * `src` is root-relative; the base path is added automatically.
+ */
+import { asset } from "../lib/paths.ts"
+
+interface Props {
+  src: string
+  alt: string
+  caption?: string
+  credit?: string
+  width?: number
+  height?: number
+  /** Break out of the text column on wide screens */
+  wide?: boolean
+}
+const { src, alt, caption, credit, width, height, wide = false } = Astro.props
+---
+
+<figure class:list={["my-10 flex flex-col gap-3", wide && "lg:-mx-16"]}>
+  <img
+    src={asset(src)}
+    alt={alt}
+    width={width}
+    height={height}
+    loading="lazy"
+    decoding="async"
+    class="w-full rounded-md border-2 bg-void"
+  />
+  {(caption || credit) && (
+    <figcaption class="flex flex-col gap-0.5 border-l-2 border-lantern/60 pl-3 font-sans text-sm text-muted">
+      {caption && <span>{caption}</span>}
+      {credit && <span class="font-mono text-xs text-faint">{credit}</span>}
+    </figcaption>
+  )}
+</figure>

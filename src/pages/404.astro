@@ -1,0 +1,26 @@
+---
+import { Lantern } from "../components/Lantern.tsx"
+import BaseLayout from "../layouts/BaseLayout.astro"
+import { href } from "../lib/paths.ts"
+---
+
+<BaseLayout
+  title="Lost in the fog"
+  description="This page does not exist, or it moved somewhere darker. Head back to the archive of horror game reviews and research."
+  noindex
+>
+  <section class="mx-auto flex max-w-xl flex-col items-center gap-6 px-4 py-28 text-center">
+    <Lantern scale={7} glow sway className="text-void" />
+    <p class="font-pixel text-6xl text-lantern">404</p>
+    <h1 class="font-serif text-4xl font-medium text-ink">Lost in the fog</h1>
+    <p class="font-serif text-xl text-muted">
+      The path you followed ends here. Maybe it was never there at all.
+    </p>
+    <a
+      href={href("/")}
+      class="pixel-shadow rounded-sm border-2 border-lantern bg-lantern px-4 py-2 text-sm font-medium text-void"
+    >
+      Follow the light back
+    </a>
+  </section>
+</BaseLayout>

@@ -1,0 +1,65 @@
+---
+import { author, categories, site } from "../config/site.ts"
+import { categoryHref, href } from "../lib/paths.ts"
+import { Lantern } from "./Lantern.tsx"
+
+interface Props {
+  /** Categories that have at least one post (archive pages exist) */
+  activeCategories?: string[]
+}
+const { activeCategories = [] } = Astro.props
+const year = new Date().getFullYear()
+---
+
+<footer class="relative mt-24 border-t-2 border-border bg-void">
+  <div
+    aria-hidden="true"
+    class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-void px-4"
+  >
+    <Lantern scale={2} glow className="text-border-strong" />
+  </div>
+  <div class="mx-auto grid max-w-6xl gap-10 px-4 pt-16 pb-10 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
+    <div class="flex flex-col gap-3">
+      <p class="font-pixel text-2xl text-ink">{site.name}</p>
+      <p class="max-w-sm font-serif text-lg text-muted">{site.description}</p>
+    </div>
+    <div class="flex flex-col gap-2 text-sm">
+      <p class="eyebrow mb-1">Read</p>
+      <a class="text-muted hover:text-lantern" href={href("/")}>
+        All articles
+      </a>
+      {(Object.keys(categories) as (keyof typeof categories)[])
+        .filter((key) => activeCategories.includes(key))
+        .map((key) => (
+          <a class="text-muted hover:text-lantern" href={categoryHref(key)}>
+            {categories[key].label}
+          </a>
+        ))}
+      <a class="text-muted hover:text-lantern" href={href("/rss.xml")}>
+        RSS feed
+      </a>
+    </div>
+    <div class="flex flex-col gap-2 text-sm">
+      <p class="eyebrow mb-1">Press</p>
+      <a class="text-muted hover:text-lantern" href={href("/press/")}>
+        Press kit & editorial policy
+      </a>
+      <a class="text-muted hover:text-lantern" href={href("/press/#scoring")}>
+        Scoring rubric
+      </a>
+      <a class="text-muted hover:text-lantern" href={href("/press/#contact")}>
+        Submit a review code
+      </a>
+      <a class="text-muted hover:text-lantern" href={site.portfolioUrl}>
+        Developer portfolio
+      </a>
+    </div>
+  </div>
+  <div class="mx-auto flex max-w-6xl flex-col gap-2 border-t border-border px-4 py-6 font-mono text-xs text-faint sm:flex-row sm:justify-between sm:px-6">
+    <p>
+      © {site.since === year ? year : `${site.since}–${year}`} {author.name}.
+      Words and opinions are my own.
+    </p>
+    <p>Written by lantern light. No trackers, no cookies.</p>
+  </div>
+</footer>

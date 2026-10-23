@@ -1,0 +1,27 @@
+---
+/** Horizontal rule with the lantern in the middle; optionally a section heading. */
+import { Lantern } from "./Lantern.tsx"
+
+interface Props {
+  label?: string
+  id?: string
+}
+const { label, id } = Astro.props
+---
+
+<div class="flex items-center gap-4">
+  <span
+    aria-hidden="true"
+    class="h-0.5 flex-1 bg-gradient-to-r from-transparent to-border"
+  ></span>
+  <Lantern scale={1.5} className="text-border-strong" />
+  {label && (
+    <h2 id={id} class="eyebrow text-muted">
+      {label}
+    </h2>
+  )}
+  <span
+    aria-hidden="true"
+    class="h-0.5 flex-1 bg-gradient-to-l from-transparent to-border"
+  ></span>
+</div>

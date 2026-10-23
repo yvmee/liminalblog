@@ -1,0 +1,80 @@
+---
+import { site } from "../config/site.ts"
+import { href } from "../lib/paths.ts"
+import { Lantern } from "./Lantern.tsx"
+
+const links = [
+  { label: "Articles", path: "/" },
+  { label: "Press & Policy", path: "/press/" },
+]
+const current = Astro.url.pathname
+---
+
+<header class="sticky top-0 z-40 border-b-2 border-border bg-background/85 backdrop-blur-md">
+  <a
+    href="#main"
+    class="sr-only z-50 rounded-sm bg-lantern px-3 py-2 text-void focus:not-sr-only focus:absolute focus:top-3 focus:left-3"
+  >
+    Skip to content
+  </a>
+  <div class="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
+    <a
+      href={site.portfolioUrl}
+      class="group flex items-center gap-1.5 rounded-sm border-2 border-border-strong px-2.5 py-1 text-xs text-muted transition-colors hover:border-lantern hover:text-lantern"
+    >
+      <span
+        aria-hidden="true"
+        class="transition-transform group-hover:-translate-x-0.5"
+      >
+        ←
+      </span>
+      <span class="sm:hidden">Portfolio</span>
+      <span class="hidden sm:inline">Back to Main Portfolio</span>
+    </a>
+
+    <a
+      href={href("/")}
+      class="group mr-auto flex items-center gap-2.5 sm:ml-2"
+      aria-label={`${site.name} home`}
+    >
+      <Lantern
+        scale={1.6}
+        sway
+        className="text-border-strong transition-colors group-hover:text-muted"
+      />
+      <span class="font-pixel text-2xl leading-none text-ink">{site.name}</span>
+    </a>
+
+    <nav aria-label="Main" class="hidden items-center gap-1 md:flex">
+      {links.map(({ label, path }) => {
+        const active = href(path) === current
+        return (
+          <a
+            href={href(path)}
+            aria-current={active ? "page" : undefined}
+            class:list={[
+              "rounded-sm px-3 py-1.5 text-sm transition-colors hover:text-lantern",
+              active ? "text-lantern" : "text-muted",
+            ]}
+          >
+            {label}
+          </a>
+        )
+      })}
+      <a
+        href={href("/rss.xml")}
+        class="ml-1 rounded-sm px-2 py-1.5 font-mono text-xs text-faint transition-colors hover:text-lantern"
+      >
+        RSS
+      </a>
+    </nav>
+
+    <a
+      href={href("/press/")}
+      class="text-sm text-muted hover:text-lantern md:hidden"
+    >
+      Press
+    </a>
+  </div>
+  <slot />
+</header>

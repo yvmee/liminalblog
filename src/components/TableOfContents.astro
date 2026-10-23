@@ -1,0 +1,93 @@
+---
+/**
+ * Contents from h2/h3. Sticky sidebar on desktop, collapsible on mobile.
+ * A small script marks the section being read with a flame.
+ */
+import type { MarkdownHeading } from "astro"
+
+import { Flame } from "./Lantern.tsx"
+
+interface Props {
+  headings: MarkdownHeading[]
+  hasVerdict?: boolean
+}
+const { headings, hasVerdict = false } = Astro.props
+const items = [
+  ...headings.filter((h) => h.depth === 2 || h.depth === 3),
+  ...(hasVerdict ? [{ depth: 2, slug: "verdict", text: "Verdict" }] : []),
+]
+---
+
+{items.length > 1 && (
+  <nav aria-label="Table of contents" class="toc">
+    <details
+      class="group rounded-md border-2 bg-surface lg:border-0 lg:bg-transparent"
+      open
+    >
+      <summary class="flex cursor-pointer list-none items-center justify-between px-4 py-3 lg:pointer-events-none lg:px-0 lg:pt-0">
+        <span class="eyebrow">On this page</span>
+        <span
+          aria-hidden="true"
+          class="font-mono text-faint group-open:rotate-90 lg:hidden"
+        >
+          ›
+        </span>
+      </summary>
+      <ol class="mx-4 mb-4 flex flex-col gap-0.5 border-l-2 border-border lg:mx-0 lg:mb-0">
+        {items.map((h) => (
+          <li>
+            <a
+              href={`#${h.slug}`}
+              data-toc-link={h.slug}
+              class:list={[
+                "group/toc relative -ml-0.5 flex items-center border-l-2 border-transparent py-1 text-sm leading-snug text-faint transition-colors hover:text-ink data-[active]:border-lantern data-[active]:text-ink",
+                h.depth === 3 ? "pl-7" : "pl-4",
+              ]}
+            >
+              <Flame
+                scale={1.5}
+                className="absolute -left-2 opacity-0 transition-opacity group-data-[active]/toc:opacity-100"
+              />
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </details>
+  </nav>
+)}
+
+<script>
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")].map(
+      (a) => [a.dataset.tocLink!, a]
+    )
+  )
+  const targets = [...links.keys()]
+    .map((id) => document.getElementById(id))
+    .filter((el): el is HTMLElement => el !== null)
+  const visible = new Set<string>()
+
+  function update() {
+    const current = targets.find((t) => visible.has(t.id))
+    if (!current) return
+    for (const [id, link] of links)
+      link.toggleAttribute("data-active", id === current.id)
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visible.add(entry.target.id)
+        else visible.delete(entry.target.id)
+      }
+      update()
+    },
+    { rootMargin: "-80px 0px -60% 0px" }
+  )
+  targets.forEach((t) => observer.observe(t))
+
+  // Collapsed by default on small screens, where it sits above the article
+  if (matchMedia("(max-width: 1023px)").matches)
+    document.querySelector(".toc details")?.removeAttribute("open")
+</script>

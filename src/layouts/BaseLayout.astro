@@ -1,0 +1,44 @@
+---
+import "../styles/global.css"
+
+import Footer from "../components/Footer.astro"
+import Nav from "../components/Nav.astro"
+import SEOHead from "../components/SEOHead.astro"
+import { site } from "../config/site.ts"
+import { asset } from "../lib/paths.ts"
+import { getPosts } from "../lib/posts.ts"
+
+type Props = Parameters<typeof SEOHead>[0]
+
+const posts = await getPosts()
+const activeCategories = [...new Set(posts.map((p) => p.data.category))]
+---
+
+<!doctype html>
+<html lang={site.lang} class="grain">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0b1114" />
+    <link rel="icon" href={asset("/favicon.svg")} type="image/svg+xml" />
+    <link
+      rel="icon"
+      href={asset("/favicon-32.png")}
+      sizes="32x32"
+      type="image/png"
+    />
+    <link rel="apple-touch-icon" href={asset("/apple-touch-icon.png")} />
+    <SEOHead {...Astro.props} />
+    <slot name="head" />
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <Nav>
+      <slot name="nav" />
+    </Nav>
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer activeCategories={activeCategories} />
+  </body>
+</html>
