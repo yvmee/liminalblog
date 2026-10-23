@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react"
 
 import { cn } from "../lib/format.ts"
+import { href } from "../lib/paths.ts"
 import { spritePaths } from "../lib/pixel.ts"
 import type { PostCard as Card } from "../lib/posts.ts"
 import { Flame, Lantern } from "./Lantern.tsx"
@@ -110,6 +111,25 @@ export default function InteractivePostFilter({
   })
 
   const tabs = [{ key: "all", label: "All" }, ...categories]
+
+  // Nothing published yet: no tabs or search, just a promise and the feed
+  if (posts.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-4 rounded-md border-2 border-dashed py-16 text-center">
+        <Lantern scale={4} glow className="text-border-strong" />
+        <p className="font-serif text-xl text-ink">
+          The first articles are on their way.
+        </p>
+        <p className="max-w-md text-sm text-muted">
+          Reviews and research are being written. Follow the{" "}
+          <a href={href("/rss.xml")} className="link">
+            RSS feed
+          </a>{" "}
+          to read them as soon as they are published.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6">

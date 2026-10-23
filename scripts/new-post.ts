@@ -162,6 +162,7 @@ async function main() {
 
   const imageDir = join(root, "public/images/posts", slug)
   mkdirSync(imageDir, { recursive: true })
+  mkdirSync(dirname(postFile), { recursive: true })
   writeFileSync(
     postFile,
     `${frontmatter(title, slug, category, review)}\n${body(slug)}`

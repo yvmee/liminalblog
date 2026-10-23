@@ -5,17 +5,20 @@ import { satteri } from "@astrojs/markdown-satteri"
 import sitemap from "@astrojs/sitemap"
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "astro/config"
-import { readdirSync, readFileSync } from "node:fs"
+import { existsSync, readdirSync, readFileSync } from "node:fs"
 
 import { BASE_PATH, SITE_URL } from "./src/config/site.ts"
 import { basePathPlugin } from "./src/lib/markdown-base-path.ts"
 
+const postsDir = "./src/content/posts"
+
 /** slug -> last modified date, read from post frontmatter for the sitemap */
 const postDates = Object.fromEntries(
-  readdirSync("./src/content/posts")
+  // The folder may be missing in a fresh clone (Git does not keep empty folders)
+  (existsSync(postsDir) ? readdirSync(postsDir) : [])
     .filter((file) => /\.mdx?$/.test(file))
     .map((file) => {
-      const source = readFileSync(`./src/content/posts/${file}`, "utf8")
+      const source = readFileSync(`${postsDir}/${file}`, "utf8")
       /** @param {string} key */
       const date = (key) =>
         source.match(new RegExp(`^${key}:\\s*["']?([\\d-]+)`, "m"))?.[1]

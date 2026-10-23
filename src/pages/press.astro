@@ -67,11 +67,16 @@ const facts = [
   ["Format", "Long-form reviews, analyses, event coverage"],
   ["Language", press.languages.join(", ")],
   ["Based in", author.location],
-  [
-    "Published",
-    `${plural(posts.length, "article")} · ${plural(reviews.length, "review")}`,
-  ],
-  ...(latest ? [["Last article", formatDate(latest)]] : []),
+  // Publication stats only once there is something to count
+  ...(latest
+    ? [
+        [
+          "Published",
+          `${plural(posts.length, "article")} · ${plural(reviews.length, "review")}`,
+        ],
+        ["Last article", formatDate(latest)],
+      ]
+    : []),
 ] as const
 ---
 

@@ -68,7 +68,8 @@ async function main() {
   )
   console.log("✓ og-default.png, favicon-32.png, apple-touch-icon.png")
 
-  for (const name of readdirSync(postsDir).filter((f) => /\.mdx?$/.test(f))) {
+  const files = existsSync(postsDir) ? readdirSync(postsDir) : []
+  for (const name of files.filter((f) => /\.mdx?$/.test(f))) {
     const source =
       readFileSync(join(postsDir, name), "utf8").split(/^---$/m)[1] ?? ""
     const cover = frontmatterValue(source, "coverImage")
